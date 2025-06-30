@@ -1,8 +1,8 @@
-# RootIntegritySDK
+# Security Utils
 
 [![](https://jitpack.io/v/yourusername/RootIntegritySDK.svg)](https://jitpack.io/#yourusername/RootIntegritySDK)
 
-A lightweight Android SDK for detecting root, emulator, mock locations, and runtime hooking to enhance app security.
+A lightweight Android SDK for detecting root, emulator and runtime hooking to enhance app security.
 
 ---
 
@@ -20,3 +20,10 @@ dependencyResolutionManagement {
         maven { url 'https://jitpack.io' }
     }
 }
+```
+### **Step 2. Add Dependency**
+
+In your **Module-level build.gradle**:
+
+```gradle
+implementation 'com.github.Ananthu77:Security-Utils:v1.0.0'
