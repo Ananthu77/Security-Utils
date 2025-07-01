@@ -31,6 +31,32 @@ implementation 'com.github.Ananthu77:Security-Utils:v1.0.0'
 ### **Step 3. Add configuration**
 
 ```kotlin
+IntegrityScanner.Builder(this)
+    .enableRootCheck(true) // enabling the root check
+    .enableEmulatorCheck(true) // enabling the emulator detection
+    .enableRuntimeHookCheck(true) // enabling if the device with hooks to bypass
+    .setCallBack(object : IntegrityCallback {
+        override fun onResult(result: DeviceIntegrityCheck) {
+            when {
+                result.isCompromised -> {
+                    // device is not safe
+                }
+                result.isEmulator -> {
+                    // emulator device
+                }
+                result.isRooted -> {
+                    // device is rooted
+                }
+                result.isRuntimeHooked -> {
+                    // device has hooked with dangerous software
+                }
+                else -> {
+                    // handle the case where none of the above conditions are met
+                }
+            }
+        }
 
+    }).build()
+    .start()
 ```
 
