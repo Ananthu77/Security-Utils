@@ -26,7 +26,7 @@ dependencyResolutionManagement {
 In your **Module-level build.gradle**:
 
 ```gradle
-implementation 'com.github.Ananthu77:Security-Utils:v1.0.0'
+implementation("com.github.Ananthu77:Security-Utils:v1.0.3")
 ```
 ### **Step 3. Add configuration**
 
