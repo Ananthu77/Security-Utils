@@ -27,3 +27,10 @@ In your **Module-level build.gradle**:
 
 ```gradle
 implementation 'com.github.Ananthu77:Security-Utils:v1.0.0'
+```
+### **Step 3. Add configuration**
+
+```kotlin
+
+```
+
