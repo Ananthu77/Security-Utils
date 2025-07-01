@@ -4,5 +4,6 @@ data class DeviceIntegrityCheck(
     var isRooted: Boolean = false,
     var isEmulator: Boolean = false,
     var hasBypassTools: Boolean = false,
-    var isRuntimeHooked: Boolean = false
+    var isRuntimeHooked: Boolean = false,
+    var isCompromised: Boolean = false
 )

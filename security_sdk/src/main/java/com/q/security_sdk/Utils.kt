@@ -1,6 +1,7 @@
 package com.q.security_sdk
 
 import java.io.BufferedReader
+import java.io.File
 import java.io.InputStreamReader
 
 fun getSystemProperty(propName: String): String? {
@@ -12,3 +13,5 @@ fun getSystemProperty(propName: String): String? {
         null
     }
 }
+
+fun anyFileExists(paths: Array<String>) = paths.any { File(it).exists() }

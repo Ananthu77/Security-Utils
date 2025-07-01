@@ -1,9 +1,10 @@
-package com.q.security_sdk
+package com.q.security_sdk.security
 
 import android.content.pm.PackageManager
+import android.util.Log
 import java.io.File
 
-object CheckDevice {
+object HookDetection {
 
     fun isMaliciousDevice(pm: PackageManager): Boolean = checkBypassingTools(pm)
             || checkFridaServer()
@@ -11,6 +12,7 @@ object CheckDevice {
             || checkTracePid()
             || isSELinuxPermissive()
             || checkLoadedLibraries()
+            || checkRunningProcess()
 
 
     private fun checkBypassingTools(pm: PackageManager): Boolean {
@@ -29,7 +31,7 @@ object CheckDevice {
                 pm.getPackageInfo(pkg, 0)
                 return true
             } catch (e: Exception) {
-
+                Log.w("security", "Tools check failed: ${e.message}")
             }
         }
         return false
@@ -45,7 +47,7 @@ object CheckDevice {
                     return true
                 }
             } catch (e: Exception) {
-
+                Log.w("security", "Server checking failed: ${e.message}")
             }
         }
         return false
@@ -53,8 +55,7 @@ object CheckDevice {
 
     private fun checkFridaGadget(): Boolean {
         val fridaClasses = arrayOf(
-            "re.frida.Server",
-            "frida.Agent"
+            "re.frida.Server", "frida.Agent"
         )
 
         for (clazz in fridaClasses) {
@@ -62,13 +63,14 @@ object CheckDevice {
                 Class.forName(clazz)
                 return true
             } catch (e: Exception) {
-
+                Log.w("security", "Gadget checking failed: ${e.message}")
             }
         }
         return false
     }
 
     private fun checkTracePid(): Boolean {
+        var isBeingTraced = false
         try {
             val file = File("/proc/self/status")
             if (file.exists()) {
@@ -76,15 +78,16 @@ object CheckDevice {
                     if (line.startsWith("TracerPid:")) {
                         val tracePid = line.split(":")[1].trim().toInt()
                         if (tracePid != 0) {
+                            isBeingTraced = true
                             return@forEachLine
                         }
                     }
                 }
             }
         } catch (e: Exception) {
-
+            Log.w("security", "TracePid checking failed: ${e.message}")
         }
-        return false
+        return isBeingTraced
     }
 
     private fun isSELinuxPermissive(): Boolean {
@@ -92,23 +95,39 @@ object CheckDevice {
             val process = Runtime.getRuntime().exec("getenforce")
             val result = process.inputStream.bufferedReader().readLine()
             result.equals("Permissive", ignoreCase = true)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
 
     private fun checkLoadedLibraries(): Boolean {
+        var isLibraryLoaded = false
         try {
             val mapsFile = File("/proc/self/maps")
             if (mapsFile.exists()) {
                 mapsFile.forEachLine { line ->
                     if (line.contains("frida") || line.contains("substrate") || line.contains("xposed")) {
+                        isLibraryLoaded = true
                         return@forEachLine
                     }
                 }
             }
         } catch (e: Exception) {
+            Log.w("security", "Failed Checking loaded libraries: ${e.message}")
         }
-        return false
+        return isLibraryLoaded
+    }
+
+    private fun checkRunningProcess(): Boolean {
+        var processIsRunning = false
+        val suspicious = listOf("frida-server", "xposed", "magisk")
+        val process = Runtime.getRuntime().exec("ps")
+        process.inputStream.bufferedReader().forEachLine {
+            if (suspicious.any() { tool -> it.contains(tool, ignoreCase = true)}) {
+                processIsRunning = true
+                return@forEachLine
+            }
+        }
+        return processIsRunning
     }
 }

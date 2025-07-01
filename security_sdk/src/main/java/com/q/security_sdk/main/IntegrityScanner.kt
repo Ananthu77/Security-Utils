@@ -1,15 +1,15 @@
 package com.q.security_sdk.main
 
 import android.content.Context
-import com.q.security_sdk.CheckDevice
-import com.q.security_sdk.EmulatorCheck
+import com.q.security_sdk.security.HookDetection
+import com.q.security_sdk.security.EmulatorCheck
 import com.q.security_sdk.IntegrityCallback
-import com.q.security_sdk.RootCheck
+import com.q.security_sdk.security.RootCheck
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class SecurityIntegrityCheck private constructor(
+class IntegrityScanner private constructor(
     private val context: Context,
     private val enableRootCheck: Boolean,
     private val enableEmulatorCheck: Boolean,
@@ -29,7 +29,8 @@ class SecurityIntegrityCheck private constructor(
                 result.isEmulator = EmulatorCheck.isEmulator(context)
             }
             if (enableRuntimeHookCheck) {
-                result.isRuntimeHooked = CheckDevice.isMaliciousDevice(pm)
+                result.isRuntimeHooked = HookDetection.isMaliciousDevice(pm)
+                result.hasBypassTools = result.isRuntimeHooked
             }
             CoroutineScope(Dispatchers.Main).launch {
                 callback.onResult(result)
@@ -52,7 +53,7 @@ class SecurityIntegrityCheck private constructor(
 
         fun setCallBack(callback: IntegrityCallback) = apply { this.callback = callback }
 
-        fun build(): SecurityIntegrityCheck = SecurityIntegrityCheck(
+        fun build(): IntegrityScanner = IntegrityScanner(
             context,
             enableRootCheck,
             enableEmulatorCheck,
