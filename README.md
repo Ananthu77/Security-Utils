@@ -30,7 +30,7 @@ implementation 'com.github.Ananthu77:Security-Utils:v1.0.0'
 ```
 ### **Step 3. Add configuration**
 
-In your **starting Activity/Fragment/Application class add the following
+In your **starting Activity/Fragment/Application class** add the following
 ```kotlin
 IntegrityScanner.Builder(this)
     .enableRootCheck(true) // enabling the root check
